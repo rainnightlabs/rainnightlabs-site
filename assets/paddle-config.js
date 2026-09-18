@@ -1,1 +1,1 @@
-window.RAINNIGHT_PADDLE={environment:'sandbox',clientToken:'',productId:'pro_01m2t1wm8w2hfh4apxcr3fdj5j',priceId:'pri_01m2t1zv55fefxr0dw8m7jm63c'};
+window.RAINNIGHT_PADDLE={environment:'sandbox',clientToken:'test_353edbf28f51b2cbcd019161e39',productId:'pro_01m2t1wm8w2hfh4apxcr3fdj5j',priceId:'pri_01m2t1zv55fefxr0dw8m7jm63c'};
