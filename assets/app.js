@@ -87,8 +87,7 @@ async function requestLicense(transactionId,email){
       settings:{
         displayMode:'overlay',
         theme:'dark',
-        locale:'en',
-        successUrl:'https://rainnightlabs.com/pricing/?checkout=success'
+        locale:'en'
       },
       customData:{
         product:'list2sheet',
