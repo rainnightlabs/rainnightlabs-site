@@ -58,7 +58,8 @@ export default async function handler(req, res) {
       {
         headers: {
           Authorization: `Bearer ${apiKey}`,
-          "Content-Type": "application/json"
+          "Content-Type": "application/json",
+          "Paddle-Version": "1"
         }
       }
     );
@@ -68,7 +69,17 @@ export default async function handler(req, res) {
 
   const payload = await response.json().catch(() => null);
   if (!response.ok || !payload?.data) {
-    return json(res, 502, { error: "Unable to verify Paddle transaction" });
+    const code = payload?.error?.code || "unknown";
+    const detail = response.status === 403
+      ? "Paddle API permission denied. The API key needs Transactions: Read and Customers: Read."
+      : response.status === 401
+        ? "Paddle API authentication failed. Check that PADDLE_API_KEY is a Sandbox API key."
+        : "Unable to verify Paddle transaction.";
+    console.error("PADDLE_TRANSACTION_VERIFY_FAILED", JSON.stringify({
+      status: response.status,
+      code
+    }));
+    return json(res, 502, { error: detail });
   }
 
   const transaction = payload.data;
