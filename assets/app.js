@@ -1,0 +1,2 @@
+const year=document.querySelector('[data-year]'); if(year) year.textContent=new Date().getFullYear();
+document.querySelectorAll('[data-paddle-placeholder]').forEach(el=>el.addEventListener('click',e=>{e.preventDefault();alert('Paddle Sandbox checkout will be connected here in the next step.');}));
