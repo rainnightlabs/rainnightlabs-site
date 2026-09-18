@@ -2,70 +2,43 @@
 
 This repository contains the first deployable website for **Rainnight Labs**.
 
-## Purpose
+## Current state
 
-Phase 1 is intentionally simple. It gives us a real HTTPS website that can later be connected to:
-
-- `rainnightlabs.com`
-- Paddle Sandbox / Live Checkout
-- List2Sheet licensing
-- Chrome Web Store and Microsoft Edge Add-ons
-- future digital assets
+- Brand domain: `https://rainnightlabs.com`
+- Vercel production deployment: active
+- Paddle environment: Sandbox
+- List2Sheet validation price: **$19 USD one-time**
+- Paddle product ID: `pro_01m2t1wm8w2hfh4apxcr3fdj5j`
+- Paddle price ID: `pri_01m2t1zv55fefxr0dw8m7jm63c`
 
 ## Current pages
 
 - `/` — Rainnight Labs home
 - `/products/` — products
 - `/products/list2sheet/` — List2Sheet
-- `/pricing/` — pricing
+- `/pricing/` — pricing and Paddle Sandbox checkout
 - `/privacy/` — privacy policy
 - `/terms/` — terms
 - `/refund/` — refund policy
 - `/contact/` — contact
 
-## Deploy to Vercel
-
-1. Create a GitHub repository.
-2. Upload the contents of this folder to the repository root.
-3. In Vercel choose **Add New → Project**.
-4. Import the GitHub repository.
-5. Framework preset: **Other**.
-6. Leave Build Command empty.
-7. Leave Output Directory empty.
-8. Deploy.
-
-Vercel should produce an address such as:
-
-```text
-https://rainnightlabs-site.vercel.app
-```
-
-## Later: connect the domain
-
-Do this only after the Vercel deployment works:
-
-1. Vercel → Project → Settings → Domains.
-2. Add:
-   - `rainnightlabs.com`
-   - `www.rainnightlabs.com`
-3. Vercel will show the exact DNS records.
-4. Add those DNS records in Dynadot.
-5. Wait until Vercel shows **Valid Configuration**.
-
-Do not copy DNS values from random tutorials. Use the values Vercel shows for this project.
-
 ## Paddle integration
 
-The first site version does **not** contain a live payment credential.
+The public Paddle Sandbox identifiers live in `assets/paddle-config.js`.
 
-The upgrade buttons currently point to placeholders. We will add Paddle only after:
+The remaining frontend requirement is a **Sandbox client-side token** from:
 
-1. the site is deployed;
-2. Paddle Sandbox is created;
-3. List2Sheet Pro exists as a Sandbox product/price;
-4. we have the Sandbox client-side token and price ID.
+`Paddle → Developer tools → Authentication → Client-side tokens`
 
-Never commit Paddle API keys or webhook secrets to GitHub.
+Client-side tokens are designed to be used in frontend code. Do **not** put Paddle API keys or webhook secrets in this repository.
+
+The next backend phase is:
+
+1. Open a real Paddle Sandbox checkout.
+2. Confirm a test transaction.
+3. Configure a webhook destination.
+4. Verify webhook signatures server-side.
+5. Generate and validate List2Sheet licenses.
 
 ## Brand
 
