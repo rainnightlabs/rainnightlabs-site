@@ -96,3 +96,15 @@ async function requestLicense(transactionId,email){
     });
   }));
 })();
+
+(function setupLicenseRecovery(){
+  const form=document.querySelector('[data-license-recover]');
+  if(!form) return;
+  form.addEventListener('submit',async(e)=>{
+    e.preventDefault();
+    const transactionId=document.querySelector('[data-recover-transaction]')?.value?.trim();
+    const email=document.querySelector('[data-recover-email]')?.value?.trim();
+    if(!transactionId||!email) return;
+    await requestLicense(transactionId,email);
+  });
+})();
