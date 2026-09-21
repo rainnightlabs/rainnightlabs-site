@@ -41,7 +41,7 @@ async function requestLicense(transactionId,email){
     });
     const data=await response.json();
     if(!response.ok) throw new Error(data.error||'License generation failed');
-    showLicenseStatus('Payment verified. Save this license together with your purchase email.',data.license);
+    showLicenseStatus('Payment verified. Copy this license into List2Sheet. Your purchase email is only needed if you ever recover the license.',data.license);
   }catch(error){
     showLicenseStatus('Payment succeeded, but automatic license delivery is not ready: '+error.message);
   }
