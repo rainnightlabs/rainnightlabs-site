@@ -40,9 +40,14 @@ async function getDiscount(apiKey, discountId) {
     return {
       ok: false,
       status: response.status,
-      error: response.status === 403
-        ? "Paddle API key needs Discounts: Read permission"
-        : "Unable to read launch discount"
+      code: payload?.error?.code || "unknown",
+      error: response.status === 401
+        ? "Paddle API authentication failed"
+        : response.status === 403
+          ? "Paddle API key needs Discounts: Read permission, or the key is for the wrong environment"
+          : response.status === 404
+            ? "Launch discount was not found in this Paddle environment"
+            : "Unable to read launch discount"
     };
   }
 
@@ -106,8 +111,11 @@ export default async function handler(req, res) {
 
   const lookup = await getDiscount(apiKey, earlyDiscountId);
   if (!lookup.ok) {
-    return json(res, lookup.status === 403 ? 503 : 502, {
-      error: lookup.error || "Launch offer status is temporarily unavailable"
+    return json(res, lookup.status === 401 || lookup.status === 403 ? 503 : 502, {
+      error: lookup.error || "Launch offer status is temporarily unavailable",
+      paddleStatus: lookup.status || null,
+      paddleCode: lookup.code || "unknown",
+      environment: environmentFromToken(clientToken)
     });
   }
 
