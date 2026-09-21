@@ -99,8 +99,6 @@ export default async function handler(req, res) {
     const transaction = event.data || {};
     const customData = transaction.custom_data || {};
 
-    // Phase 1: prove that the signed payment event reaches our backend.
-    // Phase 2 will mint and deliver a List2Sheet license.
     console.log("PADDLE_TRANSACTION_COMPLETED", JSON.stringify({
       eventId: event.event_id,
       transactionId: transaction.id,
@@ -108,6 +106,18 @@ export default async function handler(req, res) {
       currencyCode: transaction.currency_code,
       product: customData.product || null,
       productId: customData.product_id || null,
+      occurredAt: event.occurred_at
+    }));
+  } else if (event.event_type === "adjustment.created" || event.event_type === "adjustment.updated") {
+    const adjustment = event.data || {};
+    console.log("PADDLE_ADJUSTMENT_EVENT", JSON.stringify({
+      eventId: event.event_id,
+      eventType: event.event_type,
+      adjustmentId: adjustment.id,
+      transactionId: adjustment.transaction_id,
+      action: adjustment.action,
+      status: adjustment.status,
+      type: adjustment.type,
       occurredAt: event.occurred_at
     }));
   } else {
