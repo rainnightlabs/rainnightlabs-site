@@ -3,6 +3,8 @@ import { paddleBase } from "../lib/paddle-entitlement.js";
 const LEGACY_PRODUCT_ID = "pro_01m2t1wm8w2hfh4apxcr3fdj5j";
 const LEGACY_PRICE_ID = "pri_01m2t1zv55fefxr0dw8m7jm63c";
 const LEGACY_CLIENT_TOKEN = "test_353edbf28f51b2cbcd019161e39";
+const SANDBOX_STANDARD_PRICE_ID = "pri_01m31gpcr52ypr0d30t5yg59t0";
+const SANDBOX_EARLY_DISCOUNT_ID = "dsc_01m31h3h1q0c2vshpejxnt583n";
 
 function json(res, status, body) {
   res.setHeader("Cache-Control", "no-store, max-age=0");
@@ -73,8 +75,16 @@ export default async function handler(req, res) {
 
   const clientToken = process.env.PADDLE_CLIENT_TOKEN || LEGACY_CLIENT_TOKEN;
   const productId = process.env.LIST2SHEET_PRODUCT_ID || LEGACY_PRODUCT_ID;
-  const standardPriceId = String(process.env.LIST2SHEET_STANDARD_PRICE_ID || "").trim();
-  const earlyDiscountId = String(process.env.LIST2SHEET_EARLY_DISCOUNT_ID || "").trim();
+  const environment = environmentFromToken(clientToken);
+
+  // Sandbox catalog IDs are public identifiers, so keep the tested launch
+  // setup in source. Live IDs still come only from Vercel environment variables.
+  const standardPriceId = environment === "sandbox"
+    ? SANDBOX_STANDARD_PRICE_ID
+    : String(process.env.LIST2SHEET_STANDARD_PRICE_ID || "").trim();
+  const earlyDiscountId = environment === "sandbox"
+    ? SANDBOX_EARLY_DISCOUNT_ID
+    : String(process.env.LIST2SHEET_EARLY_DISCOUNT_ID || "").trim();
 
   if (standardPriceId && !/^pri_[a-z0-9]{26}$/.test(standardPriceId)) {
     return json(res, 500, {
@@ -93,7 +103,7 @@ export default async function handler(req, res) {
   if (!standardPriceId) {
     return json(res, 200, {
       mode: "legacy",
-      environment: environmentFromToken(clientToken),
+      environment,
       clientToken,
       productId,
       priceId: LEGACY_PRICE_ID,
@@ -106,7 +116,7 @@ export default async function handler(req, res) {
   if (!earlyDiscountId) {
     return json(res, 200, {
       mode: "standard",
-      environment: environmentFromToken(clientToken),
+      environment,
       clientToken,
       productId,
       priceId: standardPriceId,
@@ -127,14 +137,14 @@ export default async function handler(req, res) {
       error: lookup.error || "Launch offer status is temporarily unavailable",
       paddleStatus: lookup.status || null,
       paddleCode: lookup.code || "unknown",
-      environment: environmentFromToken(clientToken)
+      environment
     });
   }
 
   const active = discountIsAvailable(lookup.discount);
   return json(res, 200, {
     mode: "launch_limit",
-    environment: environmentFromToken(clientToken),
+    environment,
     clientToken,
     productId,
     priceId: standardPriceId,
