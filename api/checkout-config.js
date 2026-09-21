@@ -76,6 +76,18 @@ export default async function handler(req, res) {
   const standardPriceId = String(process.env.LIST2SHEET_STANDARD_PRICE_ID || "").trim();
   const earlyDiscountId = String(process.env.LIST2SHEET_EARLY_DISCOUNT_ID || "").trim();
 
+  if (standardPriceId && !/^pri_[a-z0-9]{26}$/.test(standardPriceId)) {
+    return json(res, 500, {
+      error: "LIST2SHEET_STANDARD_PRICE_ID must be a Paddle Price ID starting with pri_"
+    });
+  }
+
+  if (earlyDiscountId && !/^dsc_[a-z0-9]{26}(?:@dscrev_[a-z0-9]{26})?$/.test(earlyDiscountId)) {
+    return json(res, 500, {
+      error: "LIST2SHEET_EARLY_DISCOUNT_ID must be the Paddle Discount ID starting with dsc_, not the checkout discount code"
+    });
+  }
+
   // Until the $29 catalog price and limited discount are configured, keep the
   // existing Sandbox checkout working exactly as before.
   if (!standardPriceId) {
