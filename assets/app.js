@@ -3,6 +3,7 @@ if(year) year.textContent=new Date().getFullYear();
 
 let checkoutConfigCache=null;
 let activeCheckoutConfig=null;
+let completedCheckoutTransactionId=null;
 
 function showLicenseStatus(message, license){
   const box=document.querySelector('[data-license-result]');
@@ -31,6 +32,7 @@ function showLicenseStatus(message, license){
       copy.textContent='Copied';
     });
     box.appendChild(copy);
+    setTimeout(()=>box.scrollIntoView({behavior:'smooth',block:'center'}),50);
   }
 }
 
@@ -175,7 +177,19 @@ function setCheckoutUnavailable(message){
       if(event?.name==='checkout.completed'){
         const transactionId=event.data?.transaction_id;
         const email=event.data?.customer?.email;
-        if(transactionId&&email) requestLicense(transactionId,email);
+
+        if(transactionId&&email&&completedCheckoutTransactionId!==transactionId){
+          completedCheckoutTransactionId=transactionId;
+
+          // Paddle's green success screen lives inside the checkout overlay.
+          // Our license is rendered by Rainnight Labs on the pricing page, so
+          // close the overlay after successful payment before provisioning.
+          try{ Paddle.Checkout.close(); }catch{}
+
+          setTimeout(()=>{
+            requestLicense(transactionId,email);
+          },250);
+        }
       }
 
       if(event?.name==='checkout.error'&&activeCheckoutConfig?.discountId){
