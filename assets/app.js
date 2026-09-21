@@ -34,19 +34,51 @@ function showLicenseStatus(message, license){
   }
 }
 
+function wait(ms){
+  return new Promise(resolve=>setTimeout(resolve,ms));
+}
+
 async function requestLicense(transactionId,email){
-  showLicenseStatus('Payment completed. Generating your List2Sheet license…');
-  try{
-    const response=await fetch('/api/license-issue/',{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({transactionId,email})
-    });
-    const data=await response.json();
-    if(!response.ok) throw new Error(data.error||'License generation failed');
-    showLicenseStatus('Payment verified. Copy this license into List2Sheet. Your purchase email is only needed if you ever recover the license.',data.license);
-  }catch(error){
-    showLicenseStatus('Payment succeeded, but automatic license delivery is not ready: '+error.message);
+  const maxAttempts=15;
+  showLicenseStatus('Payment completed. Verifying the transaction and generating your List2Sheet license…');
+
+  for(let attempt=1;attempt<=maxAttempts;attempt++){
+    try{
+      const response=await fetch('/api/license-issue/',{
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({transactionId,email})
+      });
+      const data=await response.json().catch(()=>({}));
+
+      if(response.ok&&data.license){
+        showLicenseStatus('Payment verified. Copy this license into List2Sheet. Your purchase email is only needed if you ever recover the license.',data.license);
+        return;
+      }
+
+      // Paddle Checkout can finish a few seconds before the Transactions API
+      // reports the transaction as completed. Retry briefly instead of making
+      // the buyer recover the license manually.
+      if(response.status===409&&data.error==='Transaction is not completed'&&attempt<maxAttempts){
+        showLicenseStatus(`Payment received. Finalizing your license… (${attempt}/${maxAttempts})`);
+        await wait(2000);
+        continue;
+      }
+
+      throw new Error(data.error||'License generation failed');
+    }catch(error){
+      if(attempt<maxAttempts&&/network|fetch/i.test(String(error?.message||error))){
+        showLicenseStatus(`Payment received. Retrying license delivery… (${attempt}/${maxAttempts})`);
+        await wait(2000);
+        continue;
+      }
+
+      showLicenseStatus(
+        'Payment succeeded, but the license could not be delivered automatically yet. '+
+        'Wait a moment, then use Recover license below with transaction '+transactionId+'.'
+      );
+      return;
+    }
   }
 }
 
