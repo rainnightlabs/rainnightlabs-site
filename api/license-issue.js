@@ -1,6 +1,9 @@
 import { issueLicense } from "../lib/license.js";
-
-const EXPECTED_PRICE_ID = "pri_01m2t1zv55fefxr0dw8m7jm63c";
+import {
+  fetchPaddleTransaction,
+  containsExpectedPrice,
+  entitlementStatus
+} from "../lib/paddle-entitlement.js";
 
 function json(res, status, body) {
   res.setHeader("Content-Type", "application/json; charset=utf-8");
@@ -14,28 +17,13 @@ function parseBody(req) {
   try { return JSON.parse(req.body); } catch { return {}; }
 }
 
-function paddleBase(apiKey) {
-  return apiKey.startsWith("pdl_live_")
-    ? "https://api.paddle.com"
-    : "https://sandbox-api.paddle.com";
-}
-
-function containsExpectedPrice(transaction) {
-  const items = Array.isArray(transaction.items) ? transaction.items : [];
-  return items.some((item) =>
-    item?.price?.id === EXPECTED_PRICE_ID ||
-    item?.price_id === EXPECTED_PRICE_ID
-  );
-}
-
 export default async function handler(req, res) {
   if (req.method !== "POST") {
     res.setHeader("Allow", "POST");
     return json(res, 405, { error: "Method not allowed" });
   }
 
-  const apiKey = process.env.PADDLE_API_KEY;
-  if (!apiKey) {
+  if (!process.env.PADDLE_API_KEY) {
     return json(res, 503, { error: "License service is not configured yet" });
   }
 
@@ -51,44 +39,30 @@ export default async function handler(req, res) {
     return json(res, 400, { error: "Purchase email is required" });
   }
 
-  let response;
-  try {
-    response = await fetch(
-      `${paddleBase(apiKey)}/transactions/${encodeURIComponent(transactionId)}?include=customer`,
-      {
-        headers: {
-          Authorization: `Bearer ${apiKey}`,
-          "Content-Type": "application/json",
-          "Paddle-Version": "1"
-        }
-      }
-    );
-  } catch {
-    return json(res, 502, { error: "Unable to reach Paddle" });
+  const paddle = await fetchPaddleTransaction(transactionId, { includeCustomer: true });
+  if (!paddle.ok) {
+    const status = paddle.unavailable ? 502 : 403;
+    return json(res, status, { error: paddle.error || "Unable to verify Paddle transaction." });
   }
 
-  const payload = await response.json().catch(() => null);
-  if (!response.ok || !payload?.data) {
-    const code = payload?.error?.code || "unknown";
-    const detail = response.status === 403
-      ? "Paddle API permission denied. The API key needs Transactions: Read and Customers: Read."
-      : response.status === 401
-        ? "Paddle API authentication failed. Check that PADDLE_API_KEY is a Sandbox API key."
-        : "Unable to verify Paddle transaction.";
-    console.error("PADDLE_TRANSACTION_VERIFY_FAILED", JSON.stringify({
-      status: response.status,
-      code
-    }));
-    return json(res, 502, { error: detail });
-  }
-
-  const transaction = payload.data;
+  const transaction = paddle.transaction;
   if (transaction.status !== "completed") {
     return json(res, 409, { error: "Transaction is not completed" });
   }
 
   if (!containsExpectedPrice(transaction)) {
     return json(res, 403, { error: "Transaction does not include List2Sheet Pro" });
+  }
+
+  const entitlement = entitlementStatus(transaction);
+  if (!entitlement.active) {
+    return json(res, 403, {
+      error: entitlement.reason === "refunded"
+        ? "This purchase has been refunded"
+        : entitlement.reason === "chargeback"
+          ? "This purchase is no longer eligible because of a chargeback"
+          : "This purchase is not eligible for a Pro license"
+    });
   }
 
   const paddleEmail = transaction.customer?.email;
