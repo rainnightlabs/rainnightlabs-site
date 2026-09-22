@@ -65,3 +65,22 @@ Required for the limited launch offer:
 The server-side `PADDLE_API_KEY` also needs `discount.read` in addition to the transaction/customer permissions already used by licensing. The API key remains server-side only.
 
 At checkout, Rainnight Labs queries the discount's current `times_used` and `usage_limit`. While the discount is active and below its limit, the $10 discount is applied automatically to the $29 price. When the limit is reached, checkout automatically falls through to $29.
+
+
+## License installation limits
+
+List2Sheet Pro licenses support up to **3 active installations** per Paddle transaction.
+
+The API stores only a random extension installation UUID, last-seen timestamp score, and the Paddle transaction ID. It does not use Google account identity or hardware serial numbers.
+
+Persistent enforcement is enabled when either of these Redis REST credential pairs is configured in Vercel:
+
+- `UPSTASH_REDIS_REST_URL` + `UPSTASH_REDIS_REST_TOKEN`
+- `KV_REST_API_URL` + `KV_REST_API_TOKEN`
+
+Without one of those pairs, license verification stays backwards-compatible but reports activation protection as disabled. This prevents an incomplete storage setup from locking out already-paid customers.
+
+Endpoints:
+
+- `POST /api/license-verify/` registers or refreshes the current installation and rejects a fourth installation.
+- `POST /api/license-release/` releases the current installation slot when the user deactivates Pro in that browser.
