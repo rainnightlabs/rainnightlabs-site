@@ -6,7 +6,7 @@ This repository contains the first deployable website for **Rainnight Labs**.
 
 - Brand domain: `https://rainnightlabs.com`
 - Vercel production deployment: active
-- Paddle environment: Sandbox
+- Paddle environment: Live migration in progress (Production env vars configured in Vercel; awaiting post-redeploy verification)
 - List2Sheet launch offer: **first 500 completed purchases at $19 USD one-time**\n- Standard price after the launch offer: **$29 USD one-time**
 - Paddle product ID: `pro_01m2t1wm8w2hfh4apxcr3fdj5j`
 - Paddle price ID: `pri_01m2t1zv55fefxr0dw8m7jm63c`
@@ -84,3 +84,14 @@ Endpoints:
 
 - `POST /api/license-verify/` registers or refreshes the current installation and rejects a fourth installation.
 - `POST /api/license-release/` releases the current installation slot when the user deactivates Pro in that browser.
+
+
+## Paddle Live identifiers
+
+Public Live catalog identifiers for List2Sheet Pro:
+
+- Product ID: `pro_01m38mvdkreb44bp67h8mj1p0a`
+- Standard $29 one-time Price ID: `pri_01m38mxjyk7z54nefmd6b253bh`
+- First-500 $10 Discount ID: `dsc_01m38n1f04rh8g3vdcg73wrd6x`
+
+Secrets such as the Live API key and webhook secret remain in Vercel Production environment variables only.
