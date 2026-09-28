@@ -167,8 +167,6 @@ function setCheckoutUnavailable(message){
 
   if(config.environment==='sandbox'){
     Paddle.Environment.set('sandbox');
-  }else if(config.environment==='production'){
-    Paddle.Environment.set('production');
   }
 
   Paddle.Initialize({
