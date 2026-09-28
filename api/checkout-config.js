@@ -73,7 +73,17 @@ export default async function handler(req, res) {
     return json(res, 405, { error: "Method not allowed" });
   }
 
-  const clientToken = process.env.PADDLE_CLIENT_TOKEN || LEGACY_CLIENT_TOKEN;
+  const configuredClientToken = String(process.env.PADDLE_CLIENT_TOKEN || "").trim();
+  const isProductionDeployment = process.env.VERCEL_ENV === "production";
+
+  // Production must never silently fall back to Sandbox credentials.
+  if (isProductionDeployment && (!configuredClientToken || configuredClientToken.startsWith("test_"))) {
+    return json(res, 503, {
+      error: "Paddle Live client token is not configured for the Production deployment"
+    });
+  }
+
+  const clientToken = configuredClientToken || LEGACY_CLIENT_TOKEN;
   const productId = process.env.LIST2SHEET_PRODUCT_ID || LEGACY_PRODUCT_ID;
   const environment = environmentFromToken(clientToken);
 
@@ -126,9 +136,15 @@ export default async function handler(req, res) {
     });
   }
 
-  const apiKey = process.env.PADDLE_API_KEY;
+  const apiKey = String(process.env.PADDLE_API_KEY || "").trim();
   if (!apiKey) {
     return json(res, 503, { error: "Launch offer status is temporarily unavailable" });
+  }
+
+  if (environment === "production" && !apiKey.startsWith("pdl_live_")) {
+    return json(res, 503, {
+      error: "Paddle Live API key is not configured for the Production checkout"
+    });
   }
 
   const lookup = await getDiscount(apiKey, earlyDiscountId);
