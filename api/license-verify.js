@@ -50,33 +50,41 @@ export default async function handler(req, res) {
     });
   }
 
-  const paddle = await fetchPaddleTransaction(signed.transactionId);
-  if (!paddle.ok) {
-    const status = paddle.unavailable ? 503 : 403;
-    return json(res, status, {
-      valid: false,
-      unavailable: Boolean(paddle.unavailable),
-      reason: "purchase_verification_failed"
-    });
-  }
+  const activationLimit = signed.kind === "owner" ? 5 : maxInstallations();
 
-  const entitlement = entitlementStatus(paddle.transaction);
-  if (!entitlement.active) {
-    return json(res, 403, {
-      valid: false,
-      reason: entitlement.reason
-    });
+  if (signed.kind !== "owner") {
+    const paddle = await fetchPaddleTransaction(signed.transactionId);
+    if (!paddle.ok) {
+      const status = paddle.unavailable ? 503 : 403;
+      return json(res, status, {
+        valid: false,
+        unavailable: Boolean(paddle.unavailable),
+        reason: "purchase_verification_failed"
+      });
+    }
+
+    const entitlement = entitlementStatus(paddle.transaction);
+    if (!entitlement.active) {
+      return json(res, 403, {
+        valid: false,
+        reason: entitlement.reason
+      });
+    }
   }
 
   let activation = {
     configured: false,
     allowed: true,
     used: null,
-    limit: maxInstallations()
+    limit: activationLimit
   };
 
   if (validInstallationId(installationId)) {
-    activation = await registerInstallation(signed.transactionId, String(installationId).trim());
+    activation = await registerInstallation(
+      signed.transactionId,
+      String(installationId).trim(),
+      activationLimit
+    );
     if (!activation.ok) {
       return json(res, 503, {
         valid: false,
@@ -101,6 +109,7 @@ export default async function handler(req, res) {
     valid: true,
     product: signed.product,
     transactionId: signed.transactionId,
+    licenseType: signed.kind || "customer",
     activations: {
       protected: Boolean(activation.configured),
       used: activation.used,
