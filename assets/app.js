@@ -4,6 +4,8 @@ if(year) year.textContent=new Date().getFullYear();
 let checkoutConfigCache=null;
 let activeCheckoutConfig=null;
 let completedCheckoutTransactionId=null;
+let checkoutCustomerEmail=null;
+const PENDING_LICENSE_KEY='rainnight_pending_license_v1';
 
 function showLicenseStatus(message, license){
   const box=document.querySelector('[data-license-result]');
@@ -40,49 +42,114 @@ function wait(ms){
   return new Promise(resolve=>setTimeout(resolve,ms));
 }
 
-async function requestLicense(transactionId,email){
-  const maxAttempts=15;
-  showLicenseStatus('Payment completed. Verifying the transaction and generating your List2Sheet license…');
+async function requestLicense(transactionId,email,{resume=false}={}){
+  // WeChat Pay is a deferred-capture payment method. Checkout may complete
+  // before Paddle marks the related transaction as completed, so wait long
+  // enough for capture instead of assuming instant settlement.
+  const maxAttempts=145;
+  const retryDelayMs=5000;
+  const safeEmail=String(email||'').trim();
+
+  if(!transactionId) return;
+
+  try{
+    localStorage.setItem(PENDING_LICENSE_KEY,JSON.stringify({
+      transactionId,
+      email:safeEmail,
+      createdAt:Date.now()
+    }));
+  }catch{}
+
+  showLicenseStatus(
+    (resume?'Resuming payment verification. ':'Payment authorized. ')+
+    'Transaction: '+transactionId+
+    '. Waiting for Paddle to finish processing before generating your List2Sheet license…'
+  );
 
   for(let attempt=1;attempt<=maxAttempts;attempt++){
     try{
       const response=await fetch('/api/license-issue/',{
         method:'POST',
         headers:{'Content-Type':'application/json'},
-        body:JSON.stringify({transactionId,email})
+        body:JSON.stringify({transactionId,email:safeEmail})
       });
       const data=await response.json().catch(()=>({}));
 
       if(response.ok&&data.license){
-        showLicenseStatus('Payment verified. Copy this license into List2Sheet. Your purchase email is only needed if you ever recover the license.',data.license);
+        try{localStorage.removeItem(PENDING_LICENSE_KEY);}catch{}
+        showLicenseStatus(
+          'Payment verified. Transaction: '+transactionId+
+          '. Copy this license into List2Sheet. Your purchase email is only needed if you ever recover the license.',
+          data.license
+        );
         return;
       }
 
-      // Paddle Checkout can finish a few seconds before the Transactions API
-      // reports the transaction as completed. Retry briefly instead of making
-      // the buyer recover the license manually.
       if(response.status===409&&data.error==='Transaction is not completed'&&attempt<maxAttempts){
-        showLicenseStatus(`Payment received. Finalizing your license… (${attempt}/${maxAttempts})`);
-        await wait(2000);
+        showLicenseStatus(
+          'Payment authorized. Transaction: '+transactionId+
+          '. Paddle is still capturing the payment… ('+attempt+'/'+maxAttempts+')'
+        );
+        await wait(retryDelayMs);
         continue;
+      }
+
+      // If Paddle.js did not return the email after an external payment flow,
+      // keep the transaction ID visible so the buyer can recover manually.
+      if(response.status===400&&/email/i.test(String(data.error||''))){
+        showLicenseStatus(
+          'Payment was received. Transaction: '+transactionId+
+          '. Paddle did not return the purchase email to this page. Once the transaction is completed, use Recover license below with this transaction ID and the email entered at checkout.'
+        );
+        return;
       }
 
       throw new Error(data.error||'License generation failed');
     }catch(error){
-      if(attempt<maxAttempts&&/network|fetch/i.test(String(error?.message||error))){
-        showLicenseStatus(`Payment received. Retrying license delivery… (${attempt}/${maxAttempts})`);
-        await wait(2000);
+      if(attempt<maxAttempts&&/network|fetch|unable to reach paddle/i.test(String(error?.message||error))){
+        showLicenseStatus(
+          'Payment received. Transaction: '+transactionId+
+          '. Retrying license delivery… ('+attempt+'/'+maxAttempts+')'
+        );
+        await wait(retryDelayMs);
         continue;
       }
 
       showLicenseStatus(
-        'Payment succeeded, but the license could not be delivered automatically yet. '+
-        'Wait a moment, then use Recover license below with transaction '+transactionId+'.'
+        'Payment succeeded, but the license could not be delivered automatically yet. Transaction: '+
+        transactionId+
+        '. Wait a moment, then use Recover license below with the purchase email.'
       );
       return;
     }
   }
+
+  showLicenseStatus(
+    'Payment is still being finalized by Paddle. Transaction: '+transactionId+
+    '. Keep this transaction ID. You can use Recover license below once the transaction reaches completed status.'
+  );
 }
+
+function rememberCheckoutCustomer(event){
+  const email=event?.data?.customer?.email;
+  if(email) checkoutCustomerEmail=String(email).trim();
+}
+
+(function resumePendingLicense(){
+  let pending=null;
+  try{pending=JSON.parse(localStorage.getItem(PENDING_LICENSE_KEY)||'null');}catch{}
+  if(!pending?.transactionId) return;
+
+  // Keep stale pending purchases from retrying forever.
+  if(Date.now()-Number(pending.createdAt||0)>24*60*60*1000){
+    try{localStorage.removeItem(PENDING_LICENSE_KEY);}catch{}
+    return;
+  }
+
+  setTimeout(()=>{
+    requestLicense(pending.transactionId,pending.email,{resume:true});
+  },750);
+})();
 
 async function loadCheckoutConfig({fresh=false}={}){
   if(!fresh&&checkoutConfigCache) return checkoutConfigCache;
@@ -172,16 +239,17 @@ function setCheckoutUnavailable(message){
   Paddle.Initialize({
     token:config.clientToken,
     eventCallback:function(event){
+      if(event?.name==='checkout.customer.created'||event?.name==='checkout.customer.updated'){
+        rememberCheckoutCustomer(event);
+      }
+
       if(event?.name==='checkout.completed'){
         const transactionId=event.data?.transaction_id;
-        const email=event.data?.customer?.email;
+        const email=event.data?.customer?.email||checkoutCustomerEmail||'';
 
-        if(transactionId&&email&&completedCheckoutTransactionId!==transactionId){
+        if(transactionId&&completedCheckoutTransactionId!==transactionId){
           completedCheckoutTransactionId=transactionId;
 
-          // Paddle's green success screen lives inside the checkout overlay.
-          // Our license is rendered by Rainnight Labs on the pricing page, so
-          // close the overlay after successful payment before provisioning.
           try{ Paddle.Checkout.close(); }catch{}
 
           setTimeout(()=>{
