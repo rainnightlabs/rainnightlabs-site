@@ -1,60 +1,54 @@
 # Extension Monetization Kit — Storefront Setup
 
-This document covers only the Rainnight Labs storefront for the paid Kit. It does not replace the buyer-facing setup docs inside the Kit.
+This storefront intentionally reuses Rainnight Labs' existing Paddle authentication. Normally the only new Paddle values are the Kit's product ID and price ID.
 
-## 1. Paddle catalog
+## 1. Create the Kit product
 
 Create a separate Paddle product:
 
 - Name: `Rainnight Extension Monetization Kit`
 - Description: `Commercialization infrastructure for turning an existing Chrome extension into a paid product.`
+- Tax category: `standard` (pre-written downloadable software)
 - Price name: `Early Access — One-time`
 - Currency: USD
 - Amount: $39.00
 - Billing: one-time / non-recurring
 - Quantity: 1
 
-Do this in Sandbox first. Sandbox and Live use separate catalog IDs and credentials.
+Create it in Sandbox first. Sandbox and Live have separate product/price IDs.
 
-## 2. Vercel environment variables
+## 2. Vercel variables
 
-Preview / Sandbox:
+New values normally required:
 
 ```
-EXTENSION_KIT_CLIENT_TOKEN=test_...
 EXTENSION_KIT_PRODUCT_ID=pro_...
 EXTENSION_KIT_PRICE_ID=pri_...
-EXTENSION_KIT_PADDLE_API_KEY=pdl_sdbx_...
 BLOB_READ_WRITE_TOKEN=...
 EXTENSION_KIT_BLOB_PATH=...
 ```
 
-Production / Live:
+The storefront falls back to Rainnight's existing `PADDLE_CLIENT_TOKEN` and `PADDLE_API_KEY`.
+
+Optional overrides exist if the Kit ever needs separate Paddle credentials:
 
 ```
-EXTENSION_KIT_CLIENT_TOKEN=live_...
-EXTENSION_KIT_PRODUCT_ID=pro_...
-EXTENSION_KIT_PRICE_ID=pri_...
-EXTENSION_KIT_PADDLE_API_KEY=pdl_live_...
-BLOB_READ_WRITE_TOKEN=...
-EXTENSION_KIT_BLOB_PATH=...
+EXTENSION_KIT_CLIENT_TOKEN=
+EXTENSION_KIT_PADDLE_API_KEY=
 ```
 
-Never put `EXTENSION_KIT_PADDLE_API_KEY` or `BLOB_READ_WRITE_TOKEN` in browser JavaScript.
+Never put API keys or Blob tokens in browser JavaScript.
 
-## 3. Required test sequence
+## 3. Test order
 
-1. Deploy the branch with Sandbox variables.
-2. Open `/products/extension-monetization-kit/`.
-3. Complete one Sandbox checkout.
-4. Confirm the transaction belongs to `EXTENSION_KIT_PRICE_ID`.
-5. Confirm the buyer receives a short-lived private ZIP URL.
-6. Use the recovery form with transaction ID + purchase email and confirm a fresh URL is issued.
-7. Refund the Sandbox transaction and confirm download recovery is rejected.
-8. Only then configure Live variables.
-9. Run one controlled real $39 purchase and verify private delivery.
-10. Merge the sales branch after the real purchase path passes.
-
-## 4. Product release rule
-
-Do not merge this storefront to production while any required product/delivery environment variable is missing.
+1. Create Sandbox Product + $39 one-time Price.
+2. Configure Sandbox `EXTENSION_KIT_PRODUCT_ID` and `EXTENSION_KIT_PRICE_ID` on the preview deployment.
+3. Configure Private Blob delivery.
+4. Complete Sandbox checkout.
+5. Confirm private download.
+6. Confirm recovery creates a fresh download URL.
+7. Refund the Sandbox transaction and confirm recovery is rejected.
+8. Create the same Product + Price in Live.
+9. Configure the Live IDs.
+10. Run one controlled real $39 purchase.
+11. Merge the sales branch only after that passes.
