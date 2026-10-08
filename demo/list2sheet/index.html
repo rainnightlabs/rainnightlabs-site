@@ -1,0 +1,398 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>List2Sheet Demo — Rainnight Labs</title>
+  <meta name="description" content="A safe demo dataset for testing List2Sheet. Extract a fictional product list and export it to Excel, CSV, JSON or Markdown.">
+  <link rel="icon" href="/assets/favicon.svg">
+  <link rel="stylesheet" href="/assets/styles.css">
+  <style>
+    .demo-hero{padding:78px 0 36px}
+    .demo-hero h1{font-size:clamp(38px,6vw,64px);line-height:1.04;letter-spacing:-.05em;margin:14px 0 18px;max-width:850px}
+    .demo-hero p{font-size:18px;color:var(--muted);max-width:760px;margin:0 0 24px}
+    .demo-note{display:flex;gap:12px;align-items:flex-start;padding:16px 18px;border:1px solid #2c4b6e;border-radius:14px;background:rgba(13,31,53,.75);color:#bfd2e6;margin-top:22px;max-width:820px}
+    .demo-note strong{color:#fff}
+    .demo-toolbar{display:flex;justify-content:space-between;gap:16px;align-items:end;flex-wrap:wrap;margin-bottom:20px}
+    .demo-toolbar h2{margin:0}
+    .demo-toolbar p{margin:4px 0 0;color:var(--muted)}
+    .dataset{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+    .demo-item{border:1px solid var(--line);border-radius:16px;background:linear-gradient(180deg,rgba(17,31,52,.94),rgba(10,21,37,.9));padding:18px;box-shadow:0 12px 32px rgba(0,0,0,.18)}
+    .demo-item .category{display:inline-block;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#a8cff5;border:1px solid #31577e;border-radius:999px;padding:3px 8px;margin-bottom:13px}
+    .demo-item h3{font-size:18px;line-height:1.3;margin:0 0 12px}
+    .meta{display:grid;grid-template-columns:1fr 1fr;gap:10px;font-size:13px}
+    .meta div{padding:9px 10px;border-radius:10px;background:#0a1626;border:1px solid #1c3048}
+    .meta span{display:block;color:#7189a3;font-size:10px;text-transform:uppercase;letter-spacing:.07em;margin-bottom:2px}
+    .meta strong{font-size:14px;color:#eaf5ff}
+    .steps{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:22px}
+    .step{border:1px solid var(--line);border-radius:14px;padding:18px;background:#0c1829}
+    .step b{display:inline-flex;width:26px;height:26px;align-items:center;justify-content:center;border-radius:8px;background:#173353;color:#b9dcff;margin-bottom:10px}
+    .step p{margin:0;color:var(--muted);font-size:14px}
+    @media(max-width:900px){.dataset{grid-template-columns:repeat(2,1fr)}.steps{grid-template-columns:repeat(2,1fr)}}
+    @media(max-width:620px){.dataset,.steps{grid-template-columns:1fr}.demo-hero{padding-top:58px}}
+  </style>
+</head>
+<body>
+<nav class="nav">
+  <div class="wrap navin">
+    <a class="brand" href="/"><span class="mark"></span>Rainnight Labs</a>
+    <div class="links">
+      <a href="/products/">Products</a>
+      <a href="/products/list2sheet/">List2Sheet</a>
+      <a href="/pricing/">Pricing</a>
+    </div>
+  </div>
+</nav>
+
+<main>
+  <section class="demo-hero">
+    <div class="wrap">
+      <div class="eyebrow">List2Sheet · Safe demo page</div>
+      <h1>Try web extraction on a clean, fictional dataset.</h1>
+      <p>This page is intentionally built for product demos and testing. Every product below is fictional, so you can record, extract, filter and export the data without relying on a third-party website.</p>
+      <div class="actions">
+        <a class="btn primary" href="https://chromewebstore.google.com/detail/list2sheet-%E2%80%93-web-scraper/hahlfenbbkphaciaknjebgpckncolkon" target="_blank" rel="noopener">Install List2Sheet</a>
+        <a class="btn" href="/products/list2sheet/">Product page</a>
+      </div>
+      <div class="demo-note"><div>✓</div><div><strong>Demo-safe content.</strong> Names, prices, ratings and stock values below are fictional and exist only to demonstrate structured extraction.</div></div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="wrap">
+      <div class="demo-toolbar">
+        <div>
+          <h2>Demo product catalog</h2>
+          <p>30 repeated cards · 5 extractable fields per item</p>
+        </div>
+        <span class="kicker">Fictional sample data</span>
+      </div>
+
+      <div class="dataset">
+        <article class="demo-item" data-demo-row="1">
+          <div class="category">Accessories</div>
+          <h3 class="product-name">Aurora Wireless Keyboard</h3>
+          <div class="meta">
+            <div><span>Price</span><strong class="price">$39</strong></div>
+            <div><span>Rating</span><strong class="rating">4.7 / 5</strong></div>
+            <div><span>Stock</span><strong class="stock">128 units</strong></div>
+            <div><span>SKU</span><strong class="sku">RN-001</strong></div>
+          </div>
+        </article>
+        <article class="demo-item" data-demo-row="2">
+          <div class="category">Accessories</div>
+          <h3 class="product-name">Drift USB-C Hub</h3>
+          <div class="meta">
+            <div><span>Price</span><strong class="price">$29</strong></div>
+            <div><span>Rating</span><strong class="rating">4.5 / 5</strong></div>
+            <div><span>Stock</span><strong class="stock">76 units</strong></div>
+            <div><span>SKU</span><strong class="sku">RN-002</strong></div>
+          </div>
+        </article>
+        <article class="demo-item" data-demo-row="3">
+          <div class="category">Office</div>
+          <h3 class="product-name">Lumen Desk Lamp</h3>
+          <div class="meta">
+            <div><span>Price</span><strong class="price">$25</strong></div>
+            <div><span>Rating</span><strong class="rating">4.8 / 5</strong></div>
+            <div><span>Stock</span><strong class="stock">54 units</strong></div>
+            <div><span>SKU</span><strong class="sku">RN-003</strong></div>
+          </div>
+        </article>
+        <article class="demo-item" data-demo-row="4">
+          <div class="category">Accessories</div>
+          <h3 class="product-name">Slate Mechanical Keyboard</h3>
+          <div class="meta">
+            <div><span>Price</span><strong class="price">$79</strong></div>
+            <div><span>Rating</span><strong class="rating">4.9 / 5</strong></div>
+            <div><span>Stock</span><strong class="stock">31 units</strong></div>
+            <div><span>SKU</span><strong class="sku">RN-004</strong></div>
+          </div>
+        </article>
+        <article class="demo-item" data-demo-row="5">
+          <div class="category">Office</div>
+          <h3 class="product-name">Nimbus Laptop Stand</h3>
+          <div class="meta">
+            <div><span>Price</span><strong class="price">$42</strong></div>
+            <div><span>Rating</span><strong class="rating">4.6 / 5</strong></div>
+            <div><span>Stock</span><strong class="stock">88 units</strong></div>
+            <div><span>SKU</span><strong class="sku">RN-005</strong></div>
+          </div>
+        </article>
+        <article class="demo-item" data-demo-row="6">
+          <div class="category">Audio</div>
+          <h3 class="product-name">Echo Compact Speaker</h3>
+          <div class="meta">
+            <div><span>Price</span><strong class="price">$49</strong></div>
+            <div><span>Rating</span><strong class="rating">4.4 / 5</strong></div>
+            <div><span>Stock</span><strong class="stock">63 units</strong></div>
+            <div><span>SKU</span><strong class="sku">RN-006</strong></div>
+          </div>
+        </article>
+        <article class="demo-item" data-demo-row="7">
+          <div class="category">Accessories</div>
+          <h3 class="product-name">Orbit Wireless Mouse</h3>
+          <div class="meta">
+            <div><span>Price</span><strong class="price">$34</strong></div>
+            <div><span>Rating</span><strong class="rating">4.7 / 5</strong></div>
+            <div><span>Stock</span><strong class="stock">145 units</strong></div>
+            <div><span>SKU</span><strong class="sku">RN-007</strong></div>
+          </div>
+        </article>
+        <article class="demo-item" data-demo-row="8">
+          <div class="category">Video</div>
+          <h3 class="product-name">Harbor Webcam 2K</h3>
+          <div class="meta">
+            <div><span>Price</span><strong class="price">$59</strong></div>
+            <div><span>Rating</span><strong class="rating">4.6 / 5</strong></div>
+            <div><span>Stock</span><strong class="stock">47 units</strong></div>
+            <div><span>SKU</span><strong class="sku">RN-008</strong></div>
+          </div>
+        </article>
+        <article class="demo-item" data-demo-row="9">
+          <div class="category">Office</div>
+          <h3 class="product-name">Fern Desk Mat</h3>
+          <div class="meta">
+            <div><span>Price</span><strong class="price">$19</strong></div>
+            <div><span>Rating</span><strong class="rating">4.8 / 5</strong></div>
+            <div><span>Stock</span><strong class="stock">212 units</strong></div>
+            <div><span>SKU</span><strong class="sku">RN-009</strong></div>
+          </div>
+        </article>
+        <article class="demo-item" data-demo-row="10">
+          <div class="category">Audio</div>
+          <h3 class="product-name">Pulse USB Microphone</h3>
+          <div class="meta">
+            <div><span>Price</span><strong class="price">$69</strong></div>
+            <div><span>Rating</span><strong class="rating">4.5 / 5</strong></div>
+            <div><span>Stock</span><strong class="stock">38 units</strong></div>
+            <div><span>SKU</span><strong class="sku">RN-010</strong></div>
+          </div>
+        </article>
+        <article class="demo-item" data-demo-row="11">
+          <div class="category">Bags</div>
+          <h3 class="product-name">Summit Laptop Sleeve</h3>
+          <div class="meta">
+            <div><span>Price</span><strong class="price">$27</strong></div>
+            <div><span>Rating</span><strong class="rating">4.7 / 5</strong></div>
+            <div><span>Stock</span><strong class="stock">93 units</strong></div>
+            <div><span>SKU</span><strong class="sku">RN-011</strong></div>
+          </div>
+        </article>
+        <article class="demo-item" data-demo-row="12">
+          <div class="category">Office</div>
+          <h3 class="product-name">Cove Cable Organizer</h3>
+          <div class="meta">
+            <div><span>Price</span><strong class="price">$16</strong></div>
+            <div><span>Rating</span><strong class="rating">4.3 / 5</strong></div>
+            <div><span>Stock</span><strong class="stock">184 units</strong></div>
+            <div><span>SKU</span><strong class="sku">RN-012</strong></div>
+          </div>
+        </article>
+        <article class="demo-item" data-demo-row="13">
+          <div class="category">Office</div>
+          <h3 class="product-name">Nova Monitor Light</h3>
+          <div class="meta">
+            <div><span>Price</span><strong class="price">$45</strong></div>
+            <div><span>Rating</span><strong class="rating">4.8 / 5</strong></div>
+            <div><span>Stock</span><strong class="stock">66 units</strong></div>
+            <div><span>SKU</span><strong class="sku">RN-013</strong></div>
+          </div>
+        </article>
+        <article class="demo-item" data-demo-row="14">
+          <div class="category">Accessories</div>
+          <h3 class="product-name">Glide Trackpad Pad</h3>
+          <div class="meta">
+            <div><span>Price</span><strong class="price">$21</strong></div>
+            <div><span>Rating</span><strong class="rating">4.4 / 5</strong></div>
+            <div><span>Stock</span><strong class="stock">104 units</strong></div>
+            <div><span>SKU</span><strong class="sku">RN-014</strong></div>
+          </div>
+        </article>
+        <article class="demo-item" data-demo-row="15">
+          <div class="category">Office</div>
+          <h3 class="product-name">Vale Portable Stand</h3>
+          <div class="meta">
+            <div><span>Price</span><strong class="price">$31</strong></div>
+            <div><span>Rating</span><strong class="rating">4.6 / 5</strong></div>
+            <div><span>Stock</span><strong class="stock">72 units</strong></div>
+            <div><span>SKU</span><strong class="sku">RN-015</strong></div>
+          </div>
+        </article>
+        <article class="demo-item" data-demo-row="16">
+          <div class="category">Office</div>
+          <h3 class="product-name">Wisp Mini Fan</h3>
+          <div class="meta">
+            <div><span>Price</span><strong class="price">$24</strong></div>
+            <div><span>Rating</span><strong class="rating">4.5 / 5</strong></div>
+            <div><span>Stock</span><strong class="stock">57 units</strong></div>
+            <div><span>SKU</span><strong class="sku">RN-016</strong></div>
+          </div>
+        </article>
+        <article class="demo-item" data-demo-row="17">
+          <div class="category">Power</div>
+          <h3 class="product-name">Arc Charging Dock</h3>
+          <div class="meta">
+            <div><span>Price</span><strong class="price">$52</strong></div>
+            <div><span>Rating</span><strong class="rating">4.7 / 5</strong></div>
+            <div><span>Stock</span><strong class="stock">41 units</strong></div>
+            <div><span>SKU</span><strong class="sku">RN-017</strong></div>
+          </div>
+        </article>
+        <article class="demo-item" data-demo-row="18">
+          <div class="category">Stationery</div>
+          <h3 class="product-name">Moss Notebook Set</h3>
+          <div class="meta">
+            <div><span>Price</span><strong class="price">$14</strong></div>
+            <div><span>Rating</span><strong class="rating">4.9 / 5</strong></div>
+            <div><span>Stock</span><strong class="stock">166 units</strong></div>
+            <div><span>SKU</span><strong class="sku">RN-018</strong></div>
+          </div>
+        </article>
+        <article class="demo-item" data-demo-row="19">
+          <div class="category">Power</div>
+          <h3 class="product-name">Beacon Power Bank</h3>
+          <div class="meta">
+            <div><span>Price</span><strong class="price">$46</strong></div>
+            <div><span>Rating</span><strong class="rating">4.6 / 5</strong></div>
+            <div><span>Stock</span><strong class="stock">82 units</strong></div>
+            <div><span>SKU</span><strong class="sku">RN-019</strong></div>
+          </div>
+        </article>
+        <article class="demo-item" data-demo-row="20">
+          <div class="category">Audio</div>
+          <h3 class="product-name">Tide Bluetooth Earbuds</h3>
+          <div class="meta">
+            <div><span>Price</span><strong class="price">$55</strong></div>
+            <div><span>Rating</span><strong class="rating">4.5 / 5</strong></div>
+            <div><span>Stock</span><strong class="stock">95 units</strong></div>
+            <div><span>SKU</span><strong class="sku">RN-020</strong></div>
+          </div>
+        </article>
+        <article class="demo-item" data-demo-row="21">
+          <div class="category">Office</div>
+          <h3 class="product-name">Grove Pen Holder</h3>
+          <div class="meta">
+            <div><span>Price</span><strong class="price">$18</strong></div>
+            <div><span>Rating</span><strong class="rating">4.4 / 5</strong></div>
+            <div><span>Stock</span><strong class="stock">119 units</strong></div>
+            <div><span>SKU</span><strong class="sku">RN-021</strong></div>
+          </div>
+        </article>
+        <article class="demo-item" data-demo-row="22">
+          <div class="category">Video</div>
+          <h3 class="product-name">Halo Ring Light</h3>
+          <div class="meta">
+            <div><span>Price</span><strong class="price">$36</strong></div>
+            <div><span>Rating</span><strong class="rating">4.7 / 5</strong></div>
+            <div><span>Stock</span><strong class="stock">68 units</strong></div>
+            <div><span>SKU</span><strong class="sku">RN-022</strong></div>
+          </div>
+        </article>
+        <article class="demo-item" data-demo-row="23">
+          <div class="category">Power</div>
+          <h3 class="product-name">Peak Travel Adapter</h3>
+          <div class="meta">
+            <div><span>Price</span><strong class="price">$33</strong></div>
+            <div><span>Rating</span><strong class="rating">4.6 / 5</strong></div>
+            <div><span>Stock</span><strong class="stock">77 units</strong></div>
+            <div><span>SKU</span><strong class="sku">RN-023</strong></div>
+          </div>
+        </article>
+        <article class="demo-item" data-demo-row="24">
+          <div class="category">Bags</div>
+          <h3 class="product-name">Canvas Tech Pouch</h3>
+          <div class="meta">
+            <div><span>Price</span><strong class="price">$28</strong></div>
+            <div><span>Rating</span><strong class="rating">4.8 / 5</strong></div>
+            <div><span>Stock</span><strong class="stock">86 units</strong></div>
+            <div><span>SKU</span><strong class="sku">RN-024</strong></div>
+          </div>
+        </article>
+        <article class="demo-item" data-demo-row="25">
+          <div class="category">Office</div>
+          <h3 class="product-name">Ridge Tablet Stand</h3>
+          <div class="meta">
+            <div><span>Price</span><strong class="price">$38</strong></div>
+            <div><span>Rating</span><strong class="rating">4.5 / 5</strong></div>
+            <div><span>Stock</span><strong class="stock">61 units</strong></div>
+            <div><span>SKU</span><strong class="sku">RN-025</strong></div>
+          </div>
+        </article>
+        <article class="demo-item" data-demo-row="26">
+          <div class="category">Accessories</div>
+          <h3 class="product-name">Mist Screen Cleaner</h3>
+          <div class="meta">
+            <div><span>Price</span><strong class="price">$12</strong></div>
+            <div><span>Rating</span><strong class="rating">4.3 / 5</strong></div>
+            <div><span>Stock</span><strong class="stock">223 units</strong></div>
+            <div><span>SKU</span><strong class="sku">RN-026</strong></div>
+          </div>
+        </article>
+        <article class="demo-item" data-demo-row="27">
+          <div class="category">Accessories</div>
+          <h3 class="product-name">Ember Cable Kit</h3>
+          <div class="meta">
+            <div><span>Price</span><strong class="price">$22</strong></div>
+            <div><span>Rating</span><strong class="rating">4.6 / 5</strong></div>
+            <div><span>Stock</span><strong class="stock">137 units</strong></div>
+            <div><span>SKU</span><strong class="sku">RN-027</strong></div>
+          </div>
+        </article>
+        <article class="demo-item" data-demo-row="28">
+          <div class="category">Accessories</div>
+          <h3 class="product-name">Frost Cooling Pad</h3>
+          <div class="meta">
+            <div><span>Price</span><strong class="price">$41</strong></div>
+            <div><span>Rating</span><strong class="rating">4.4 / 5</strong></div>
+            <div><span>Stock</span><strong class="stock">49 units</strong></div>
+            <div><span>SKU</span><strong class="sku">RN-028</strong></div>
+          </div>
+        </article>
+        <article class="demo-item" data-demo-row="29">
+          <div class="category">Office</div>
+          <h3 class="product-name">Dawn Alarm Clock</h3>
+          <div class="meta">
+            <div><span>Price</span><strong class="price">$32</strong></div>
+            <div><span>Rating</span><strong class="rating">4.7 / 5</strong></div>
+            <div><span>Stock</span><strong class="stock">73 units</strong></div>
+            <div><span>SKU</span><strong class="sku">RN-029</strong></div>
+          </div>
+        </article>
+        <article class="demo-item" data-demo-row="30">
+          <div class="category">Power</div>
+          <h3 class="product-name">Trail Compact Charger</h3>
+          <div class="meta">
+            <div><span>Price</span><strong class="price">$44</strong></div>
+            <div><span>Rating</span><strong class="rating">4.8 / 5</strong></div>
+            <div><span>Stock</span><strong class="stock">58 units</strong></div>
+            <div><span>SKU</span><strong class="sku">RN-030</strong></div>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="wrap">
+      <h2>Suggested demo flow</h2>
+      <p class="lead">Use this sequence when recording a short List2Sheet demo.</p>
+      <div class="steps">
+        <div class="step"><b>1</b><p>Open List2Sheet while this page is visible.</p></div>
+        <div class="step"><b>2</b><p>Pick one product card and let List2Sheet detect the repeated structure.</p></div>
+        <div class="step"><b>3</b><p>Preview and clean the extracted rows.</p></div>
+        <div class="step"><b>4</b><p>Export the result to Excel, CSV, JSON or Markdown.</p></div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="footer">
+  <div class="wrap footerin">
+    <div>© <span data-year></span> Rainnight Labs</div>
+    <div class="footlinks"><a href="/privacy/">Privacy</a><a href="/terms/">Terms</a><a href="/contact/">Contact</a></div>
+  </div>
+</footer>
+<script src="/assets/app.js"></script>
+</body>
+</html>
