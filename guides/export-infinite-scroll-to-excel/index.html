@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Export Infinite Scroll Data to Excel Without Coding | Rainnight Labs</title>
+<meta name="description" content="Learn how to capture lazy-loaded website lists as you scroll, remove duplicates, and export the results to Excel. Includes a 60-row safe demo and honest Free vs Pro steps.">
+<link rel="canonical" href="https://rainnightlabs.com/guides/export-infinite-scroll-to-excel/">
+<meta property="og:type" content="article">
+<meta property="og:title" content="How to Export Infinite Scroll Data to Excel Without Coding">
+<meta property="og:description" content="Practice collecting lazy-loaded product lists with a safe 60-row demo page, then move the results into Excel.">
+<link rel="icon" href="/assets/favicon.svg"><link rel="stylesheet" href="/assets/styles.css">
+<style>
+.article-hero{padding:66px 0 42px}
+.article-hero h1{font-size:clamp(34px,5vw,60px);max-width:890px;letter-spacing:-.045em;line-height:1.09;margin:14px 0 19px}
+.article-hero p{color:var(--muted);max-width:800px;font-size:18px}
+.article-layout{display:grid;grid-template-columns:minmax(0,1fr) 240px;gap:58px}
+.article-body{max-width:770px;padding-bottom:74px}
+.article-body h2{font-size:29px;line-height:1.25;margin:42px 0 14px}
+.article-body h3{font-size:20px;margin:30px 0 10px}
+.article-body p,.article-body li{color:#b8cadd}
+.article-body li{margin-bottom:12px}
+.article-body ol,.article-body ul{padding-left:23px}
+.article-body strong{color:#f0f6ff}
+.article-body a:not(.btn){color:#afd7ff;text-decoration:underline;text-underline-offset:3px}
+.side-nav{position:sticky;top:102px;border:1px solid var(--line);border-radius:16px;background:#101d31;padding:19px;height:max-content}
+.side-nav strong{font-size:14px}
+.side-nav a{display:block;color:#a2bdd7;font-size:13px;line-height:1.5;margin-top:12px}
+.example{border:1px solid #305170;border-radius:17px;background:#0d2137;padding:22px;margin:25px 0}
+.example p{margin:8px 0 0}
+.steps-demo{display:flex;gap:12px;flex-wrap:wrap;margin:20px 0}
+.steps-demo div{padding:12px 14px;background:#142941;border:1px solid #315477;border-radius:11px;color:#c6dbef;font-size:13px;flex:1;min-width:150px}
+.guide-table{width:100%;border-collapse:collapse;margin:20px 0}
+.guide-table th,.guide-table td{text-align:left;padding:12px 14px;border-bottom:1px solid #314259;font-size:14px;vertical-align:top}
+.guide-table th{color:#f0f6ff;background:#142942}
+.guide-table td{color:#c3d3e3}
+.final-cta{padding:25px;border-radius:18px;border:1px solid #365e85;background:linear-gradient(135deg,#112e4f,#0b1c31);margin:38px 0}
+.final-cta h2{margin:0 0 10px}
+.final-cta p{margin:0 0 20px}
+.note{font-size:13px;color:#8ea6c0}
+@media(max-width:860px){.article-layout{grid-template-columns:1fr}.side-nav{order:-1;position:static}.article-hero{padding:48px 0 36px}}
+</style>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"HowTo","name":"How to Export Infinite Scroll Data to Excel Without Coding","description":"Learn to capture lazy-loaded web lists into a spreadsheet using a safe fictional product catalog.","tool":[{"@type":"HowToTool","name":"Google Chrome"},{"@type":"HowToTool","name":"List2Sheet browser extension"},{"@type":"HowToTool","name":"Microsoft Excel"}],"step":[{"@type":"HowToStep","name":"Identify lazy loading","text":"Use a sample page where new product cards appear after you scroll."},{"@type":"HowToStep","name":"Select the dataset","text":"Scan the page in List2Sheet, or use Pick from page if necessary."},{"@type":"HowToStep","name":"Collect across scroll batches","text":"With Pro, use Collect more and auto-scroll. Alternatively scroll manually, rescan, and use the free 100-row TSV clipboard method."},{"@type":"HowToStep","name":"Check and export","text":"Verify the row count, remove duplicates if necessary, and export XLSX with Pro or paste TSV into Excel."}]}</script>
+</head>
+<body>
+<nav class="nav"><div class="wrap navin"><a class="brand" href="/"><span class="mark"></span>Rainnight Labs</a><div class="links"><a href="/products/">Products</a><a href="/products/list2sheet/">List2Sheet</a><a href="/demo/list2sheet/infinite-scroll/">Live example</a></div></div></nav>
+<main>
+<section class="article-hero"><div class="wrap">
+<div class="eyebrow">Practical tutorial · Dynamic web pages</div>
+<h1>How to export infinite scroll data to Excel without coding</h1>
+<p>Infinite scrolling can make a product list look endless, but not all records are loaded at once. Here's how to collect the rows that appear while you scroll, check the result, and move it into Excel.</p>
+<div class="actions"><a class="btn primary" href="/demo/list2sheet/infinite-scroll/">Try the 60-row practice page</a><a class="btn" href="/products/list2sheet/">About List2Sheet</a></div>
+</div></section>
+<section class="section"><div class="wrap article-layout"><article class="article-body">
+<h2 id="problem">Why infinite scroll breaks ordinary copying</h2>
+<p>A conventional HTML table may have all its rows loaded when the page opens. An <strong>infinite-scroll</strong> page often loads only the first batch. Scrolling triggers the browser to request or render more items. If you copy the content too early, you'll only get what has appeared so far.</p>
+<p>Some sites also replace older items as you scroll (virtualization). That can make complete extraction harder, even with a browser extension. Always check whether the output is complete rather than assuming a successful scan captured everything.</p>
+
+<h2 id="demo">1. Practice on a safe, repeatable test page</h2>
+<p>Open the <a href="/demo/list2sheet/infinite-scroll/">List2Sheet Infinite Scroll Demo</a>. It uses <strong>60 fictional product records</strong>, starts with 12 cards, and loads 12 more each time you reach the bottom. No login, third-party content, or real people's data is involved.</p>
+<div class="steps-demo"><div><strong>12 rows</strong><p>Visible at the start</p></div><div><strong>+12 rows</strong><p>Added while scrolling</p></div><div><strong>60 rows</strong><p>Expected total at the end</p></div></div>
+<div class="example"><strong>Data fields to look for</strong><p>Product name, category, price, rating, stock, and SKU. The SKUs help you check for duplicate or missing records.</p></div>
+
+<h2 id="select">2. Select the repeated product list</h2>
+<ol>
+<li><a href="https://chromewebstore.google.com/detail/list2sheet-%E2%80%93-web-scraper/hahlfenbbkphaciaknjebgpckncolkon" target="_blank" rel="noopener noreferrer">Install List2Sheet from the Chrome Web Store</a>, then open the practice page in Chrome.</li>
+<li>Click the extension and choose <strong>Scan current page</strong>. Pick the dataset corresponding to the repeated product cards.</li>
+<li>If needed, choose <strong>Pick from page</strong> and click one product card so List2Sheet can infer similar nearby elements.</li>
+<li>Check the preview. A starting count near 12 is normal: the remaining items haven't loaded yet.</li>
+</ol>
+
+<h2 id="collect">3. Collect the records that load later</h2>
+<h3>Option A: List2Sheet Pro auto-scroll</h3>
+<p>Expand <strong>Collect more (PRO)</strong> and start the extension's <strong>auto-scroll collection</strong>. It scrolls the page, rescans as more content appears, and merges newly found rows while attempting to remove duplicates. Reopen the popup if you want to see the collection status. Stop the task if it isn't progressing as expected.</p>
+<p>On our test page the target is <strong>60 unique SKUs</strong>. On real sites there is no guaranteed count, so compare the collected total with the site's displayed count if available. Not every lazy-loaded or virtualized page is supported.</p>
+<h3>Option B: Free manual scroll and copy</h3>
+<p>For this small demo, you can also scroll to the bottom yourself until the page says all 60 products are loaded, reopen List2Sheet, <strong>Scan current page</strong> again, and choose <strong>Copy TSV</strong>. The free tier supports copying up to 100 rows into the clipboard, which is enough for this 60-row sample. This is a manual workaround, not an automatic scroll feature.</p>
+<div class="example"><strong>Free vs Pro</strong><p>Free: scan, select, clean, and copy up to 100 rows as TSV. Pro: automatic infinite-scroll collection, higher row limits, and XLSX/CSV/JSON/Markdown file export.</p></div>
+
+<h2 id="verify">4. Check the rows before exporting</h2>
+<p>Don't rely only on a success message. Preview the dataset, check the first and last SKU, verify that the fields are aligned, and remove obvious duplicates. List2Sheet provides field selection, keyword filtering, and cleanup controls to help you refine results.</p>
+<table class="guide-table"><thead><tr><th>Problem</th><th>What to check</th></tr></thead><tbody>
+<tr><td>Only the initial rows appear</td><td>Was more content loaded? Try manual scrolling and rescanning.</td></tr>
+<tr><td>Duplicate product cards</td><td>Check the SKU or URL fields and apply duplicate cleanup.</td></tr>
+<tr><td>Missing fields</td><td>Try Pick from page or adjust the selected dataset.</td></tr>
+<tr><td>Scrolling never finishes</td><td>Stop the task and check whether the website has a stable end-of-list signal.</td></tr>
+</tbody></table>
+
+<h2 id="export">5. Move the results into Excel</h2>
+<p>With Pro, select <strong>Export XLSX</strong> (or CSV) in List2Sheet and open the downloaded file in Excel. With the free workflow, choose <strong>Copy TSV</strong>, open Excel, select cell A1, and paste. If the paste doesn't split into columns, use Excel's Data → Text to Columns option with Tab as the delimiter.</p>
+<p>For a broader introduction to copying ordinary webpage lists into a spreadsheet, see our <a href="/guides/export-web-data-to-excel/">guide to website data and Excel without coding</a>.</p>
+
+<h2 id="responsible">Responsible extraction and limitations</h2>
+<p>Use sites and data you have permission to access. Avoid collecting private or sensitive personal information, bypassing access controls, or ignoring applicable site terms. Auto-scrolling can fail on login-required pages, heavily virtualized layouts, anti-bot protected sites, or when the DOM changes unexpectedly.</p>
+<p>If you need scheduled crawling or guaranteed large-scale extraction, consider a dedicated data API or a purpose-built pipeline instead of a lightweight browser extension.</p>
+
+<h2 id="faq">Frequently asked questions</h2>
+<h3>Can I export an infinite-scroll webpage to Excel for free?</h3>
+<p>For small pages where manual scrolling loads and retains all items, you can scroll manually, scan the loaded results, and copy up to 100 rows as TSV for pasting into Excel. List2Sheet's automatic infinite-scroll collection and direct XLSX export require Pro.</p>
+<h3>Does an infinite-scroll scraper always collect every row?</h3>
+<p>No. Some sites render records only when visible or block repeated collection. Check the dataset against the page and treat missing rows as a possibility.</p>
+<h3>Can I test this without scraping a real ecommerce website?</h3>
+<p>Yes. Our <a href="/demo/list2sheet/infinite-scroll/">60-row fictional product demo</a> is designed specifically for repeatable experiments and screen recordings.</p>
+
+<div class="final-cta"><h2>Try it on a page built for testing</h2><p>Practice with 60 fictional product cards, then decide whether the free manual workflow or Pro automatic collection makes sense for your task.</p><div class="actions"><a class="btn primary" href="/demo/list2sheet/infinite-scroll/">Open infinite-scroll demo</a><a class="btn" href="/products/list2sheet/">Explore List2Sheet</a></div></div>
+<p class="note">Tutorial by Rainnight Labs. Product features and limitations may change; always confirm results on the website you use.</p>
+</article>
+<aside class="side-nav" aria-label="Sections"><strong>In this guide</strong><a href="#problem">Why infinite scroll is different</a><a href="#demo">1. Test page</a><a href="#select">2. Select the dataset</a><a href="#collect">3. Collect new rows</a><a href="#verify">4. Verify data</a><a href="#export">5. Export to Excel</a><a href="#responsible">Limitations</a><a href="#faq">FAQ</a></aside>
+</div></section>
+</main>
+<footer class="footer"><div class="wrap footerin"><div>© <span data-year></span> Rainnight Labs</div><div class="footlinks"><a href="/privacy/">Privacy</a><a href="/terms/">Terms</a><a href="/products/list2sheet/">List2Sheet</a></div></div></footer>
+<script src="/assets/app.js"></script>
+</body></html>
