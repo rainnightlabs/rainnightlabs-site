@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Infinite Scroll Data Extraction Demo | List2Sheet</title>
+<meta name="description" content="Practice extracting an infinite-scroll product list with 60 fictional records. A safe, free test page for List2Sheet and other browser data tools.">
+<link rel="canonical" href="https://rainnightlabs.com/demo/list2sheet/infinite-scroll/">
+<link rel="icon" href="/assets/favicon.svg"><link rel="stylesheet" href="/assets/styles.css">
+<style>
+.demo-hero{padding:66px 0 38px}
+.demo-hero h1{font-size:clamp(36px,5vw,62px);line-height:1.08;letter-spacing:-.045em;margin:14px 0 20px;max-width:860px}
+.demo-hero p{color:var(--muted);font-size:18px;max-width:790px}
+.demo-info{border:1px solid #365876;background:#0d2339;padding:15px 18px;border-radius:14px;max-width:850px;margin-top:24px;color:#c3d9ed}
+.catalog-head{display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap;align-items:end;margin-bottom:24px}
+.catalog-head h2{margin:0}
+.catalog-head p{color:var(--muted);margin:4px 0 0}
+#infinite-catalog{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;align-items:stretch}
+.demo-product{border:1px solid var(--line);border-radius:16px;background:linear-gradient(180deg,#12243b,#0b1a2b);padding:20px;min-height:191px}
+.demo-product .category{font-size:11px;letter-spacing:.11em;text-transform:uppercase;color:#aad2fd}
+.demo-product h3{font-size:17px;line-height:1.35;margin:12px 0 14px}
+.item-fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.item-fields div{font-size:12px;color:#9fb8d2;background:#0b1727;border-radius:8px;padding:7px 9px}
+.item-fields strong{display:block;color:#ecf6ff;font-size:14px}
+#scroll-loader{min-height:80px;display:flex;justify-content:center;align-items:center;color:#a8c4df;font-size:14px;padding:25px;text-align:center}
+.demo-followup{margin-top:26px;padding:20px;border:1px solid #355b7d;border-radius:16px;background:#10243a}
+.demo-followup p{color:var(--muted)}
+@media(max-width:860px){#infinite-catalog{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:580px){#infinite-catalog{grid-template-columns:1fr}.demo-hero{padding-top:46px}}
+</style>
+</head>
+<body>
+<nav class="nav"><div class="wrap navin"><a class="brand" href="/"><span class="mark"></span>Rainnight Labs</a><div class="links"><a href="/products/list2sheet/">List2Sheet</a><a href="/demo/list2sheet/">Static demo</a><a href="/guides/export-infinite-scroll-to-excel/">How-to guide</a></div></div></nav>
+<main>
+<section class="demo-hero"><div class="wrap">
+<div class="eyebrow">Safe test page · List2Sheet</div>
+<h1>Infinite scroll, without real-world data.</h1>
+<p>Scroll to the bottom to load more product cards. This test page deliberately starts with 12 rows and progressively loads a total of 60 fictional records so you can practice collecting data from a dynamic list.</p>
+<div class="actions"><a class="btn primary" href="https://chromewebstore.google.com/detail/list2sheet-%E2%80%93-web-scraper/hahlfenbbkphaciaknjebgpckncolkon" target="_blank" rel="noopener noreferrer">Get List2Sheet</a><a class="btn" href="/guides/export-infinite-scroll-to-excel/">Read the step-by-step guide</a></div>
+<div class="demo-info">✓ All products, prices, ratings and quantities on this page are fictional. No account or third-party content is involved. List2Sheet's automatic infinite-scroll capture is a <strong>Pro</strong> feature; you can still scroll manually and test the free scan / Copy TSV workflow.</div>
+</div></section>
+<section class="section"><div class="wrap">
+<div class="catalog-head"><div><h2>Sample product catalog</h2><p id="catalog-count" aria-live="polite">Showing 12 of 60 fictional products</p></div><span class="kicker">12 cards per batch · 60 total</span></div>
+<div id="infinite-catalog" aria-label="Fictional products loaded by infinite scrolling"></div>
+<div id="scroll-loader" role="status" aria-live="polite">Scroll down to load more fictional products</div>
+<noscript><p>This demo requires JavaScript to simulate infinite scrolling.</p></noscript>
+<div class="demo-followup"><h2 style="margin:0">Want to export these rows?</h2><p>Open List2Sheet and scan the loaded products. For hands-free multi-batch collection, use the Pro auto-scroll feature and check the final row count before exporting to Excel or CSV.</p><div class="actions"><a class="btn" href="/products/list2sheet/">About List2Sheet</a><a class="btn" href="/guides/export-infinite-scroll-to-excel/">Collection tutorial</a></div></div>
+</div></section>
+</main>
+<footer class="footer"><div class="wrap footerin"><div>© <span data-year></span> Rainnight Labs</div><div class="footlinks"><a href="/privacy/">Privacy</a><a href="/terms/">Terms</a></div></div></footer>
+<script src="/assets/app.js"></script>
+<script>
+(function(){
+"use strict";
+const categories=["Accessories","Office","Audio","Power","Stationery","Bags"];
+const names=["Aurora Keyboard","Drift USB-C Hub","Lumen Desk Lamp","Nimbus Laptop Stand","Echo Mini Speaker","Orbit Mouse","Harbor Webcam","Fern Desk Mat","Pulse Microphone","Summit Laptop Sleeve","Nova Monitor Light","Beacon Power Bank","Cove Cable Organizer","Slate Mechanical Keyboard","Trail Travel Adapter"];
+const total=60,batchSize=12;
+const rows=Array.from({length:total},(_,i)=>({
+ id:"RN-DEMO-"+String(i+1).padStart(3,"0"),
+ name:names[i%names.length]+" "+String(Math.floor(i/names.length)+1),
+ category:categories[i%categories.length],
+ price:14+(i*7)%86,
+ rating:(4+(i%9)/10).toFixed(1),
+ stock:25+(i*13)%230
+}));
+const container=document.getElementById("infinite-catalog");
+const loader=document.getElementById("scroll-loader");
+const counter=document.getElementById("catalog-count");
+let loaded=0,busy=false;
+function appendBatch(){
+ if(busy||loaded>=total)return;
+ busy=true;
+ loader.textContent="Loading more sample products…";
+ window.setTimeout(()=>{
+  const end=Math.min(total,loaded+batchSize);
+  const fragment=document.createDocumentFragment();
+  for(let i=loaded;i<end;i++){
+   const p=rows[i],card=document.createElement("article");
+   card.className="demo-product";
+   card.setAttribute("data-product-id",p.id);
+   card.innerHTML='<div class="category">'+p.category+'</div>'+
+   '<h3 class="product-name">'+p.name+'</h3>'+
+   '<div class="item-fields">'+
+   '<div>Price<strong class="price">$'+p.price+'</strong></div>'+
+   '<div>Rating<strong class="rating">'+p.rating+' / 5</strong></div>'+
+   '<div>Stock<strong class="stock">'+p.stock+' units</strong></div>'+
+   '<div>SKU<strong class="sku">'+p.id+'</strong></div>'+
+   '</div>';
+   fragment.appendChild(card);
+  }
+  container.appendChild(fragment);
+  loaded=end;busy=false;
+  counter.textContent="Showing "+loaded+" of "+total+" fictional products";
+  loader.textContent=loaded>=total?"End of list — all 60 fictional products loaded":"Scroll down to load more fictional products";
+  if(loaded<total){observer.observe(loader);}
+ },420);
+}
+const observer=new IntersectionObserver(entries=>{
+ if(entries.some(entry=>entry.isIntersecting)&&loaded<total&&!busy){
+  observer.unobserve(loader);
+  appendBatch();
+ }
+},{rootMargin:"0px 0px 100px 0px",threshold:0});
+appendBatch();
+})();
+</script>
+</body></html>
